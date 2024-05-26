@@ -31,6 +31,8 @@ jobs:
 
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v1
+        with:
+          cargo-target-dir: benches/target
 
       - name: Install Bencher
         uses: bencherdev/bencher@v0.4.10
