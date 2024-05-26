@@ -32,17 +32,20 @@ jobs:
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v1
 
-      # - name: Install Bencher
-      #   uses: bencherdev/bencher@v0.4.10
+      - name: Install Bencher
+        uses: bencherdev/bencher@v0.4.10
 
       - name: Run benchmarks
         working-directory: benches
-        run: cargo bench
+        run: cargo bench -- 2>&1 | tee results.txt
 
-      # - run: |
-      #     bencher run --token ${{ secrets.BENCHER_API_TOKEN }} \
-      #       --branch main \
-      #       --testbed github-actions \
-      #       --adapter json \
-      #       --err \
-      #       "bencher mock"
+      - name: Upload benchmarks
+        env:
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+        run: |
+          bencher run \
+            --branch main \
+            --testbed github-actions \
+            --adapter rust_criterion \
+            --err \
+            --file results.txt
