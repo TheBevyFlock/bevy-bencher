@@ -1,18 +1,43 @@
 on:
+  # Run daily at midnight.
+  schedule:
+    - cron: 0 0 * * *
+  # Run whenever this workflow is changed.
+  push:
+    branches: [main]
+  # Allow running manually.
   workflow_dispatch:
+
+env:
+  # Force colorful output, even though we're running in Github Actions.
+  CARGO_TERM_COLOR: always
 
 jobs:
   bench:
+    name: Bench
     runs-on: ubuntu-latest
     env:
       BENCHER_PROJECT: bevy
     steps:
-      - uses: actions/checkout@v4
-      - uses: bencherdev/bencher@main
-      - run: |
-          bencher run --token ${{ secrets.BENCHER_API_TOKEN }} \
-            --branch main \
-            --testbed github-actions \
-            --adapter json \
-            --err \
-            "bencher mock"
+      - name: Checkout Bevy
+        uses: actions/checkout@v4
+        with:
+          repository: bevyengine/bevy
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # - name: Install Bencher
+      #   uses: bencherdev/bencher@v0.4.10
+
+      - name: Run benchmarks
+        working-directory: benches
+        run: cargo bench
+
+      # - run: |
+      #     bencher run --token ${{ secrets.BENCHER_API_TOKEN }} \
+      #       --branch main \
+      #       --testbed github-actions \
+      #       --adapter json \
+      #       --err \
+      #       "bencher mock"
