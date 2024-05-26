@@ -1,3 +1,5 @@
+name: Daily
+
 on:
   # Run daily at midnight.
   schedule:
@@ -26,6 +28,9 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache build files
+        uses: Leafwing-Studios/cargo-cache@v1
 
       # - name: Install Bencher
       #   uses: bencherdev/bencher@v0.4.10
