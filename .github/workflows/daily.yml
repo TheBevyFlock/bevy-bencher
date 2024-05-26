@@ -1,0 +1,18 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    env:
+      BENCHER_PROJECT: bevy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bencherdev/bencher@main
+      - run: |
+          bencher run --token ${{ secrets.BENCHER_API_TOKEN }} \
+            --branch main \
+            --testbed github-actions \
+            --adapter json \
+            --err \
+            "bencher mock"
