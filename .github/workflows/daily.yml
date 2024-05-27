@@ -50,4 +50,4 @@ jobs:
             --testbed github-actions \
             --adapter rust_criterion \
             --err \
-            --file results.txt
+            --file benches/results.txt
