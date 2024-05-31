@@ -42,7 +42,7 @@ pub fn world_get_entity(c: &mut Criterion) {
         b.iter_batched(
             || ids.choose(&mut prng).unwrap(),
             |&input| {
-                world.get_entity(input);
+                black_box(world.get_entity(input));
             },
             BatchSize::SmallInput,
         );
