@@ -21,6 +21,9 @@ jobs:
     env:
       BENCHER_PROJECT: bevy
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
