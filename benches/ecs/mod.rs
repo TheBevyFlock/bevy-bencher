@@ -29,7 +29,7 @@ pub fn world_query_iter(c: &mut Criterion) {
 
         b.iter(|| {
             for a in world.query::<&A>().iter(&world) {
-                // Pretend we're doing something with `a` so this look is not optimized away.
+                // Pretend we're doing something with `a` so this is not optimized away.
                 black_box(a);
             }
         });
