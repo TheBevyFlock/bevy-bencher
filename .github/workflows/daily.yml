@@ -16,38 +16,36 @@ env:
 
 jobs:
   bench:
-    name: Bench
+    name: Run benchmarks
     runs-on: ubuntu-latest
-    env:
-      BENCHER_PROJECT: bevy
     steps:
-      - name: Checkout Bevy
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          repository: bevyengine/bevy
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v1
-        with:
-          cargo-target-dir: benches/target
 
       - name: Install Bencher
-        uses: bencherdev/bencher@v0.4.10
+        uses: bencherdev/bencher@main
 
+      # Run benchmarks, piping output to both `results.txt` and stdout.
       - name: Run benchmarks
-        working-directory: benches
         run: cargo bench -- 2>&1 | tee results.txt
 
       - name: Upload benchmarks
         env:
+          BENCHER_PROJECT: bevy
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+          BENCHER_TESTBED: github-actions
+        # --no-hash: Do not use the Git hash, because we care about the Bevy commit and not our
+        #     own.
+        # --file: Upload saved Criterion output instead of running a command.
         run: |
           bencher run \
-            --branch main \
-            --testbed github-actions \
             --adapter rust_criterion \
+            --no-hash \
             --err \
-            --file benches/results.txt
+            --file results.txt
