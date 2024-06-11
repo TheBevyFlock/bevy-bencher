@@ -35,17 +35,30 @@ jobs:
       - name: Run benchmarks
         run: cargo bench -- 2>&1 | tee results.txt
 
+      - name: Find Bevy commit hash
+        id: bevy-hash
+        run: |
+          # Find the source property of Bevy, which returns something like:
+          # "git+https://github.com/bevyengine/bevy.git#d659a1f7d506c5c6eba9dfe2a6e878a8c72ecef6"
+          SOURCE=$(cargo metadata --format-version 1 | jq '.packages[] | select(.name == "bevy") | .source')
+
+          # Regex for a 40-character hexadecimal hash.
+          REGEX="[a-f0-9]{40}"
+
+          # Capture the hash from the source identifier.
+          HASH=$(echo $SOURCE | grep --extended-regexp --only-matching $REGEX)
+
+          echo hash=$HASH >> $GITHUB_OUTPUT
+
       - name: Upload benchmarks
         env:
           BENCHER_PROJECT: bevy
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
           BENCHER_TESTBED: github-actions
-        # --no-hash: Do not use the Git hash, because we care about the Bevy commit and not our
-        #     own.
-        # --file: Upload saved Criterion output instead of running a command.
+          BENCHER_HASH: ${{ steps.bevy-hash.outputs.hash }}
         run: |
           bencher run \
             --adapter rust_criterion \
-            --no-hash \
+            --hash $BENCHER_HASH
             --err \
             --file results.txt
