@@ -1,7 +1,7 @@
 mod types;
 
 use self::types::*;
-use bevy_ecs::prelude::*;
+use bevy::ecs::prelude::*;
 use criterion::{criterion_group, BatchSize, Criterion};
 use rand::prelude::*;
 use std::{hint::black_box, iter::repeat};
