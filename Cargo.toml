@@ -11,7 +11,7 @@ criterion = "0.5.1"
 rand = { version = "0.8.5", default-features = false, features = ["small_rng"] }
 
 # Bevy, on the latest commit.
-bevy_ecs = { git = "https://github.com/bevyengine/bevy.git" }
+bevy = { git = "https://github.com/bevyengine/bevy.git" }
 
 [[bench]]
 name = "main"
