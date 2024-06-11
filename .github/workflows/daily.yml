@@ -68,6 +68,6 @@ jobs:
         run: |
           bencher run \
             --adapter rust_criterion \
-            --hash ${{ steps.bevy-hash.outputs.hash }}
+            --hash ${{ steps.bevy-hash.outputs.hash }} \
             --err \
             --file results.txt
