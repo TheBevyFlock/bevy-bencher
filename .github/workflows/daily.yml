@@ -48,11 +48,15 @@ jobs:
           # "git+https://github.com/bevyengine/bevy.git#d659a1f7d506c5c6eba9dfe2a6e878a8c72ecef6"
           SOURCE=$(cargo metadata --format-version 1 | jq '.packages[] | select(.name == "bevy") | .source')
 
+          echo Bevy source is $SOURCE.
+
           # Regex for a 40-character hexadecimal hash.
           REGEX="[a-f0-9]{40}"
 
           # Capture the hash from the source identifier.
           HASH=$(echo $SOURCE | grep --extended-regexp --only-matching $REGEX)
+
+          echo Found hash is $HASH.
 
           echo hash=$HASH >> $GITHUB_OUTPUT
 
@@ -61,10 +65,9 @@ jobs:
           BENCHER_PROJECT: bevy
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
           BENCHER_TESTBED: github-actions
-          BENCHER_HASH: ${{ steps.bevy-hash.outputs.hash }}
         run: |
           bencher run \
             --adapter rust_criterion \
-            --hash $BENCHER_HASH
+            --hash ${{ steps.bevy-hash.outputs.hash }}
             --err \
             --file results.txt
