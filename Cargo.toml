@@ -25,7 +25,7 @@ bevy = { git = "https://github.com/bevyengine/bevy.git" }
 
 [profile.file-size]
 inherits = "release"
-# Link time optimizations.
+# Fast link time optimizations.
 lto = "thin"
 # Strip debuginfo and symbols from binary.
 strip = true
