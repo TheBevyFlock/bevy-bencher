@@ -1,0 +1,13 @@
+[package]
+name = "file-size"
+edition = "2021"
+publish = false
+
+[dependencies]
+bevy.workspace = true
+
+[[bin]]
+name = "default"
+
+[[bin]]
+name = "minimal"
