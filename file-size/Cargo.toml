@@ -5,9 +5,3 @@ publish = false
 
 [dependencies]
 bevy.workspace = true
-
-[[bin]]
-name = "default"
-
-[[bin]]
-name = "minimal"
