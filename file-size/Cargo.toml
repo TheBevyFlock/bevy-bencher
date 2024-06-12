@@ -1,0 +1,7 @@
+[package]
+name = "file-size"
+edition = "2021"
+publish = false
+
+[dependencies]
+bevy.workspace = true

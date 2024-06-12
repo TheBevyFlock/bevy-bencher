@@ -71,3 +71,62 @@ jobs:
             --hash ${{ steps.bevy-hash.outputs.hash }} \
             --err \
             --file results.txt
+
+  file-size:
+    name: Track file size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Bencher
+        uses: bencherdev/bencher@main
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          # Installs Alsa and udev.
+          sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+
+      - name: Cache build files
+        uses: Leafwing-Studios/cargo-cache@v1
+
+      # Build all file-size binaries in release mode.
+      - name: Build binaries
+        run: cargo build --package file-size --profile file-size
+
+      - name: Find Bevy commit hash
+        id: bevy-hash
+        run: |
+          # Find the source property of Bevy, which returns something like:
+          # "git+https://github.com/bevyengine/bevy.git#d659a1f7d506c5c6eba9dfe2a6e878a8c72ecef6"
+          SOURCE=$(cargo metadata --format-version 1 | jq '.packages[] | select(.name == "bevy") | .source')
+
+          echo Bevy source is $SOURCE.
+
+          # Regex for a 40-character hexadecimal hash.
+          REGEX="[a-f0-9]{40}"
+
+          # Capture the hash from the source identifier.
+          HASH=$(echo $SOURCE | grep --extended-regexp --only-matching $REGEX)
+
+          echo Found hash is $HASH.
+
+          echo hash=$HASH >> $GITHUB_OUTPUT
+
+      - name: Upload benchmarks
+        env:
+          BENCHER_PROJECT: bevy
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+          BENCHER_TESTBED: github-actions
+        run: |
+          bencher run \
+            --adapter json \
+            --hash ${{ steps.bevy-hash.outputs.hash }} \
+            --err \
+            --file-size target/file-size/default \
+            --file-size target/file-size/minimal \
+            --file-size target/file-size/empty
