@@ -28,4 +28,4 @@ inherits = "release"
 # Link time optimizations.
 lto = "thin"
 # Strip debuginfo and symbols from binary.
-# strip = true
+strip = true
