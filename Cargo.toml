@@ -22,3 +22,10 @@ members = ["file-size"]
 [workspace.dependencies]
 # Bevy, on the latest commit.
 bevy = { git = "https://github.com/bevyengine/bevy.git" }
+
+[profile.file-size]
+inherits = "release"
+# Link time optimizations.
+lto = "thin"
+# Strip debuginfo and symbols from binary.
+# strip = true

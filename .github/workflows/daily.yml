@@ -96,7 +96,7 @@ jobs:
 
       # Build all file-size binaries in release mode.
       - name: Build binaries
-        run: cargo build --package file-size --release
+        run: cargo build --package file-size --profile file-size
 
       - name: Find Bevy commit hash
         id: bevy-hash
@@ -127,5 +127,5 @@ jobs:
             --adapter json \
             --hash ${{ steps.bevy-hash.outputs.hash }} \
             --err \
-            --file-size target/release/default \
-            --file-size target/release/minimal
+            --file-size target/file-size/default \
+            --file-size target/file-size/minimal
