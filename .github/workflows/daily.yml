@@ -128,4 +128,5 @@ jobs:
             --hash ${{ steps.bevy-hash.outputs.hash }} \
             --err \
             --file-size target/file-size/default \
-            --file-size target/file-size/minimal
+            --file-size target/file-size/minimal \
+            --file-size target/file-size/empty
