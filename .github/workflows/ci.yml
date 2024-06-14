@@ -4,9 +4,11 @@ on:
   # Run daily at midnight.
   schedule:
     - cron: 0 0 * * *
-  # Run whenever this workflow is changed.
+  # Run whenever this workflow is changed on the main branch.
   push:
     branches: [main]
+  # Run whenever a PR is opened or updated, but do not upload results.
+  pull_request:
   # Allow running manually.
   workflow_dispatch:
 
@@ -61,6 +63,8 @@ jobs:
           echo hash=$HASH >> $GITHUB_OUTPUT
 
       - name: Upload benchmarks
+        # Do not upload benchmarks for pull requests.
+        if: ${{ github.event_name != 'pull_request' }}
         env:
           BENCHER_PROJECT: bevy
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
@@ -118,6 +122,8 @@ jobs:
           echo hash=$HASH >> $GITHUB_OUTPUT
 
       - name: Upload benchmarks
+        # Do not upload benchmarks for pull requests.
+        if: ${{ github.event_name != 'pull_request' }}
         env:
           BENCHER_PROJECT: bevy
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
