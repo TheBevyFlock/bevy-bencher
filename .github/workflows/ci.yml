@@ -70,7 +70,8 @@ jobs:
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
           BENCHER_TESTBED: github-actions
         run: |
-          bencher run \
+          # Do not upload benchmarks for pull requests.
+          bencher run ${{ github.event_name == 'pull_request' && '--dry-run' || '' }} \
             --adapter rust_criterion \
             --hash ${{ steps.bevy-hash.outputs.hash }} \
             --err \
@@ -122,14 +123,13 @@ jobs:
           echo hash=$HASH >> $GITHUB_OUTPUT
 
       - name: Upload benchmarks
-        # Do not upload benchmarks for pull requests.
-        if: ${{ github.event_name != 'pull_request' }}
         env:
           BENCHER_PROJECT: bevy
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
           BENCHER_TESTBED: github-actions
         run: |
-          bencher run \
+          # Do not upload benchmarks for pull requests.
+          bencher run ${{ github.event_name == 'pull_request' && '--dry-run' || '' }} \
             --adapter json \
             --hash ${{ steps.bevy-hash.outputs.hash }} \
             --err \
