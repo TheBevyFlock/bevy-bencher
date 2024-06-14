@@ -17,6 +17,35 @@ pub fn world_spawn(c: &mut Criterion) {
     });
 }
 
+/// Benchmarks despawning an entity in a [`World`].
+pub fn world_despawn(c: &mut Criterion) {
+    c.bench_function("world_despawn", |b| {
+        let mut world = World::new();
+
+        let unsafe_world_cell = world.as_unsafe_world_cell();
+
+        b.iter_batched(
+            || {
+                // SAFETY: The `&mut World` returned by this is always dropped before the routine
+                // accesses the world.
+                let world = unsafe { unsafe_world_cell.world_mut() };
+
+                world.spawn_batch(repeat((A(0), B(0))).take(64))
+            },
+            |input| {
+                // SAFETY: The `&mut World` return by this is always dropped before the setup
+                // acceses the world.
+                let world = unsafe { unsafe_world_cell.world_mut() };
+
+                for entity in input {
+                    world.despawn(entity);
+                }
+            },
+            BatchSize::SmallInput,
+        );
+    });
+}
+
 /// Benchmarks iterating over all matching entities within a [`World`].
 pub fn world_query_iter(c: &mut Criterion) {
     c.bench_function("world_query_iter", |b| {
@@ -58,4 +87,10 @@ pub fn world_get_entity(c: &mut Criterion) {
     });
 }
 
-criterion_group!(group, world_spawn, world_query_iter, world_get_entity);
+criterion_group!(
+    group,
+    world_spawn,
+    world_despawn,
+    world_query_iter,
+    world_get_entity
+);

@@ -4,10 +4,10 @@ use bevy::ecs::prelude::*;
 ///
 /// This is intended to not match with [`B`]'s size, to force the ECS to deal with padding.
 #[derive(Component, Clone)]
-pub struct A(pub u32);
+pub struct A(#[allow(dead_code)] pub u32);
 
 /// A 16-bit wide component.
 ///
 /// This is intended to not match with [`A`]'s size, to force the ECS to deal with padding.
 #[derive(Component, Clone)]
-pub struct B(pub u16);
+pub struct B(#[allow(dead_code)] pub u16);
