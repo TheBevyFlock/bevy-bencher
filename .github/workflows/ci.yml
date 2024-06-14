@@ -63,8 +63,6 @@ jobs:
           echo hash=$HASH >> $GITHUB_OUTPUT
 
       - name: Upload benchmarks
-        # Do not upload benchmarks for pull requests.
-        if: ${{ github.event_name != 'pull_request' }}
         env:
           BENCHER_PROJECT: bevy
           BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
