@@ -19,7 +19,7 @@ env:
 jobs:
   bench:
     name: Run benchmarks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -84,7 +84,7 @@ jobs:
 
   file-size:
     name: Track file size
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -144,7 +144,7 @@ jobs:
 
   deploy-report:
     name: Deploy report
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [bench]
     if: ${{ github.event_name != 'pull_request' }}
     environment:
