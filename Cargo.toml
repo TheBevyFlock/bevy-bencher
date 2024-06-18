@@ -2,6 +2,7 @@
 name = "bevy-bencher"
 edition = "2021"
 publish = false
+autobenches = false
 
 [dev-dependencies]
 bevy.workspace = true
