@@ -21,7 +21,7 @@ pub fn spawn_batch(c: &mut Criterion) {
         let mut world = World::new();
 
         b.iter(|| {
-            world.spawn_batch(std::iter::repeat((A(0), (B(0)))).take(50));
+            world.spawn_batch(repeat((A(0), (B(0)))).take(50));
         });
     });
 }
