@@ -17,6 +17,17 @@ pub fn world_spawn(c: &mut Criterion) {
     });
 }
 
+/// Benchamrks spawning a batch of entities into a [`World`].
+pub fn world_spawn_batch(c: &mut Criterion) {
+    c.bench_function("ecs::world::spawn_batch", |b| {
+        let mut world = World::new();
+
+        b.iter(|| {
+            world.spawn_batch(std::iter::repeat((A(0), (B(0)))).take(50));
+        });
+    });
+}
+
 /// Benchmarks despawning an entity in a [`World`].
 pub fn world_despawn(c: &mut Criterion) {
     c.bench_function("world_despawn", |b| {
@@ -90,6 +101,7 @@ pub fn world_get_entity(c: &mut Criterion) {
 criterion_group!(
     group,
     world_spawn,
+    world_spawn_batch,
     world_despawn,
     world_query_iter,
     world_get_entity
