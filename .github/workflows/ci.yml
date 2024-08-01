@@ -37,7 +37,7 @@ jobs:
           sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
 
       - name: Cache build files
-        uses: Leafwing-Studios/cargo-cache@v1
+        uses: Leafwing-Studios/cargo-cache@v2
 
       # Run benchmarks, piping output to both `results.txt` and stdout.
       - name: Run benchmarks
@@ -102,7 +102,7 @@ jobs:
           sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
 
       - name: Cache build files
-        uses: Leafwing-Studios/cargo-cache@v1
+        uses: Leafwing-Studios/cargo-cache@v2
 
       # Build all file-size binaries in release mode.
       - name: Build binaries
