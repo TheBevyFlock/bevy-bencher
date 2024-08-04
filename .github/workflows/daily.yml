@@ -1,0 +1,87 @@
+name: Daily benchmark
+
+on:
+  # Run daily at midnight.
+  schedule:
+    - cron: 0 0 * * *
+  # Allow running manually.
+  workflow_dispatch:
+
+jobs:
+  run-bench-suite:
+    name: Run benchmark suite
+    uses: ./.github/workflows/bench-suite.yml
+
+  upload-to-bencher:
+    name: Upload results to Bencher
+    runs-on: ubuntu-22.04
+    needs: run-bench-suite
+    steps:
+      - name: Install Bencher
+        uses: bencherdev/bencher@main
+
+      - name: Download benchmark results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results
+
+      - name: Download file size binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: file-size
+
+      - name: Upload benchmarks to Bencher
+        env:
+          BENCHER_PROJECT: bevy
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+          BENCHER_TESTBED: github-actions
+        run: |
+          bencher run \
+            --adapter rust_criterion \
+            --hash ${{ needs.run-bench-suite.outputs.bevy-hash }} \
+            --file results.txt
+
+      - name: Upload file sizes to Bencher
+        env:
+          BENCHER_PROJECT: bevy
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+          BENCHER_TESTBED: github-actions
+        run: |
+          bencher run \
+            --adapter json \
+            --hash ${{ needs.run-bench-suite.outputs.bevy-hash }} \
+            --file-size target/file-size/default \
+            --file-size target/file-size/minimal \
+            --file-size target/file-size/empty
+
+  deploy-criterion-report:
+    name: Deploy Criterion report
+    runs-on: ubuntu-22.04
+    needs: run-bench-suite
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - name: Download Crtierion report
+        uses: actions/download-artifact@v4
+        with:
+          name: criterion-report
+
+      - name: Create redirect page
+        run: echo '<meta http-equiv="refresh" content="0; url=report/index.html">' > index.html
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./
+
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
