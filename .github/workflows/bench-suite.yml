@@ -2,6 +2,11 @@ name: Benchmark Suite
 
 on:
   workflow_call:
+    inputs:
+      rev:
+        description: The Bevy revision (commit or named reference) to checkout.
+        required: false
+        type: string
     outputs:
       # This is currently just the hash from `bench`, but it should be the same for `file-size`.
       bevy-hash:
@@ -30,6 +35,17 @@ jobs:
           sudo apt-get update
           # Installs Alsa and udev.
           sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+
+      - name: Configure Bevy revision
+        if: ${{ inputs.rev }}
+        env:
+          REV: ${{ inputs.rev }}
+        run: |
+          # Update the Bevy dependency in `Cargo.toml` to specify the given revision.
+          sed -i "s|bevy = { git = \"https://github.com/bevyengine/bevy.git\" }|bevy = { git = \"https://github.com/bevyengine/bevy.git\", rev = \"$REV\" }|" Cargo.toml
+
+          # Print contents of `Cargo.toml`, for debugging purposes.
+          cat Cargo.toml
 
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v2
