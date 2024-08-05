@@ -1,7 +1,12 @@
 [package]
 name = "bevy-bencher"
+authors = ["BD103"]
 edition = "2021"
+description = "Continuous benchmarks for Bevy to track its performance over time."
+repository = "https://github.com/TheBevyFlock/bevy-bencher"
+license = "MIT OR Apache-2.0"
 publish = false
+# Do not auto-discover benchmarks, we must specify them manually.
 autobenches = false
 
 [dev-dependencies]
