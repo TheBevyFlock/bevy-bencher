@@ -31,6 +31,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: file-size
+          path: file-size
 
       - name: Upload benchmarks to Bencher
         env:
@@ -54,6 +55,6 @@ jobs:
             --dry-run \
             --adapter json \
             --hash ${{ needs.run-bench-suite.outputs.bevy-hash }} \
-            --file-size target/file-size/default \
-            --file-size target/file-size/minimal \
-            --file-size target/file-size/empty
+            --file-size file-size/default \
+            --file-size file-size/minimal \
+            --file-size file-size/empty
