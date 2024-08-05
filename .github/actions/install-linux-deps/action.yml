@@ -1,0 +1,34 @@
+# This action installs a few dependencies necessary to build Bevy on Linux. By default it installs
+# alsa and udev, but can be configured to also install Wayland dependencies:
+#
+# ```
+# - uses: ./.github/actions/install-linux-deps
+#   with:
+#     wayland: true
+# ```
+#
+# See the `inputs` section for all options and their defaults. Note that you must checkout the
+# repository before you can use this action.
+#
+# This action will only install dependencies when the current operating system is Linux. It will do
+# nothing on any other OS (macOS, Windows).
+
+name: Install Linux dependencies
+description: Installs the dependencies necessary to build Bevy on Linux.
+inputs:
+  wayland:
+    description: Install Wayland (libwayland-dev and libxkbcommon-dev).
+    required: false
+    default: false
+runs:
+  using: composite
+  steps:
+    - name: Install Linux dependencies
+      shell: bash
+      if: ${{ runner.os == 'linux' }}
+      run: >
+        sudo apt-get update
+
+        sudo apt-get install --no-install-recommends
+          libasound2-dev libudev-dev
+          ${{ fromJSON(inputs.wayland) && 'libwayland-dev libxkbcommon-dev' || '' }}
