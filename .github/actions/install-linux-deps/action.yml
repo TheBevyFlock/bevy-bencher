@@ -30,5 +30,5 @@ runs:
         sudo apt-get update
 
         sudo apt-get install --no-install-recommends
-          libasound2-dev libudev-dev
-          ${{ fromJSON(inputs.wayland) && 'libwayland-dev libxkbcommon-dev' || '' }}
+        libasound2-dev libudev-dev
+        ${{ fromJSON(inputs.wayland) && 'libwayland-dev libxkbcommon-dev' || '' }}
