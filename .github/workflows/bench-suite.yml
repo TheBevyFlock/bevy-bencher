@@ -59,7 +59,7 @@ jobs:
 
       - name: Install cargo-sweep and timestamp
         run: |
-          cargo install cargo-sweep
+          cargo install cargo-sweep --force
           cargo sweep --stamp
 
       # Run benchmarks, piping output to both `results.txt` and stdout.
@@ -119,7 +119,7 @@ jobs:
 
       - name: Install cargo-sweep and timestamp
         run: |
-          cargo install cargo-sweep
+          cargo install cargo-sweep --force
           cargo sweep --stamp
 
       # Build all file-size binaries in release mode.
