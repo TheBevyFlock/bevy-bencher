@@ -57,6 +57,12 @@ jobs:
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v2
 
+      - name: Install cargo-sweep and timestamp
+        run: |
+          cargo install cargo-sweep
+          cargo sweep --stamp
+          mv sweep.timestamp target/
+
       # Run benchmarks, piping output to both `results.txt` and stdout.
       - name: Run benchmarks
         run: cargo bench -- 2>&1 | tee results.txt
@@ -85,6 +91,11 @@ jobs:
           path: target/criterion
           if-no-files-found: error
 
+      - name: Sweep target folder
+        run: |
+          mv target/sweep.timestamp .
+          cargo sweep --file
+
   file-size:
     name: Track file size
     runs-on: ubuntu-22.04
@@ -109,6 +120,12 @@ jobs:
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v2
 
+      - name: Install cargo-sweep and timestamp
+        run: |
+          cargo install cargo-sweep
+          cargo sweep --stamp
+          mv sweep.timestamp target/
+
       # Build all file-size binaries in release mode.
       - name: Build binaries
         run: cargo build --package file-size --profile file-size
@@ -124,3 +141,8 @@ jobs:
             target/file-size/minimal
             target/file-size/empty
           if-no-files-found: error
+
+      - name: Sweep target folder
+        run: |
+          mv target/sweep.timestamp .
+          cargo sweep --file
