@@ -61,7 +61,6 @@ jobs:
         run: |
           cargo install cargo-sweep
           cargo sweep --stamp
-          mv sweep.timestamp target/
 
       # Run benchmarks, piping output to both `results.txt` and stdout.
       - name: Run benchmarks
@@ -92,9 +91,7 @@ jobs:
           if-no-files-found: error
 
       - name: Sweep target folder
-        run: |
-          mv target/sweep.timestamp .
-          cargo sweep --file
+        run: cargo sweep --file
 
   file-size:
     name: Track file size
@@ -124,7 +121,6 @@ jobs:
         run: |
           cargo install cargo-sweep
           cargo sweep --stamp
-          mv sweep.timestamp target/
 
       # Build all file-size binaries in release mode.
       - name: Build binaries
@@ -143,6 +139,4 @@ jobs:
           if-no-files-found: error
 
       - name: Sweep target folder
-        run: |
-          mv target/sweep.timestamp .
-          cargo sweep --file
+        run: cargo sweep --file
