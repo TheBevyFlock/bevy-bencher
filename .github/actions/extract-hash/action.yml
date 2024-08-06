@@ -1,0 +1,40 @@
+name: Extract hash from Bevy metadata
+description: |
+  Finds the commit hash from the Bevy metadata exported by `bench-suite.yml`.
+
+  You must verify that the Bevy dependency is in fact a Git repository. If it depends on a
+  registry, like <https://crates.io>, this action may fail and return garbled output.
+inputs:
+  metadata:
+    description: The JSON value from `bench-suite.yml`'s `bevy-metadata` output.
+    required: true
+outputs:
+  hash:
+    description: The extracted commit hash.
+    value: ${{ steps.bevy-hash.outputs.hash }}
+runs:
+  using: composite
+  steps:
+    - name: Find source hash
+      id: bevy-hash
+      shell: bash
+      env:
+        METADATA: ${{ inputs.metadata }}
+      run: |
+        # Find the source property of Bevy, which returns something like:
+        # "git+https://github.com/bevyengine/bevy.git#d659a1f7d506c5c6eba9dfe2a6e878a8c72ecef6"
+        SOURCE=$(echo $METADATA | jq '.source')
+
+        # TODO: Verify source starts with `"git+`.
+
+        echo Bevy source is $SOURCE.
+
+        # Regex for a 40-character hexadecimal hash.
+        REGEX="[a-f0-9]{40}"
+
+        # Capture the hash from the source identifier.
+        HASH=$(echo $SOURCE | grep --extended-regexp --only-matching $REGEX)
+
+        echo Found hash is $HASH.
+
+        echo hash=$HASH >> $GITHUB_OUTPUT

@@ -21,10 +21,10 @@ on:
         required: false
         type: string
     outputs:
-      # This is currently just the hash from `bench`, but it should be the same for `file-size`.
-      bevy-hash:
-        description: The Bevy commit hash that was benchmarked.
-        value: ${{ jobs.bench.outputs.bevy-hash }}
+      # This is currently just the metadata from `bench`, but it should be the same for `file-size`.
+      bevy-metadata:
+        description: The version and source metadata of Bevy, formatted as JSON.
+        value: ${{ jobs.bench.outputs.bevy-metadata }}
 
 env:
   # Force colorful output, even though we're running in Github Actions.
@@ -35,7 +35,7 @@ jobs:
     name: Run benchmarks
     runs-on: ubuntu-22.04
     outputs:
-      bevy-hash: ${{ steps.bevy-hash.outputs.hash }}
+      bevy-metadata: ${{ steps.bevy-metadata.outputs.metadata }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -61,26 +61,15 @@ jobs:
       - name: Run benchmarks
         run: cargo bench -- 2>&1 | tee results.txt
 
-      # TODO: Extract into action.
-      # TODO: Handle when it is not a Git repository.
-      - name: Find Bevy commit hash
-        id: bevy-hash
+      - name: Find Bevy metadata
+        id: bevy-metadata
         run: |
-          # Find the source property of Bevy, which returns something like:
-          # "git+https://github.com/bevyengine/bevy.git#d659a1f7d506c5c6eba9dfe2a6e878a8c72ecef6"
-          SOURCE=$(cargo metadata --format-version 1 | jq '.packages[] | select(.name == "bevy") | .source')
+          # Find the version and source properties of Bevy.
+          METADATA=$(cargo metadata --format-version 1 | jq '.packages[] | select(.name == "bevy") | { version, source }')
 
-          echo Bevy source is $SOURCE.
+          echo Bevy metadata is $SOURCE.
 
-          # Regex for a 40-character hexadecimal hash.
-          REGEX="[a-f0-9]{40}"
-
-          # Capture the hash from the source identifier.
-          HASH=$(echo $SOURCE | grep --extended-regexp --only-matching $REGEX)
-
-          echo Found hash is $HASH.
-
-          echo hash=$HASH >> $GITHUB_OUTPUT
+          echo metadata=$METADATA >> $GITHUB_OUTPUT
 
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4

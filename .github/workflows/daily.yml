@@ -31,6 +31,12 @@ jobs:
           name: file-size
           path: file-size
 
+      - name: Find Bevy hash
+        id: bevy-hash
+        uses: ./.github/actions/extract-hash
+        with:
+          metadata: ${{ needs.run-bench-suite.outputs.bevy-metadata }}
+
       - name: Upload benchmarks to Bencher
         env:
           BENCHER_PROJECT: bevy
@@ -39,7 +45,7 @@ jobs:
         run: |
           bencher run \
             --adapter rust_criterion \
-            --hash ${{ needs.run-bench-suite.outputs.bevy-hash }} \
+            --hash ${{ steps.bevy-hash.outputs.hash }} \
             --file results.txt
 
       - name: Upload file sizes to Bencher
@@ -50,7 +56,7 @@ jobs:
         run: |
           bencher run \
             --adapter json \
-            --hash ${{ needs.run-bench-suite.outputs.bevy-hash }} \
+            --hash ${{ steps.bevy-hash.outputs.hash }} \
             --file-size file-size/default \
             --file-size file-size/minimal \
             --file-size file-size/empty
