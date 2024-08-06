@@ -3,8 +3,21 @@ name: Benchmark Suite
 on:
   workflow_call:
     inputs:
-      rev:
-        description: The Bevy revision (commit or named reference) to checkout.
+      bevy-dep:
+        description: |
+          If specified, replaces the dependency on Bevy in `Cargo.toml` with a custom TOML value.
+
+          For instance, setting this value to `"0.14.1"` will update `Cargo.toml` to look like:
+
+            [dependencies]
+            bevy = "0.14.1"
+
+          You can use this to depend on a specific branch, tag, fork, or even major release of
+          Bevy. See <https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html> for
+          more information.
+
+          Please note that the input must be valid TOML and must not contain pipe `|` characters
+          due to implementation details.
         required: false
         type: string
     outputs:
@@ -34,15 +47,12 @@ jobs:
         uses: ./.github/actions/install-linux-deps
 
       - name: Configure Bevy revision
-        if: ${{ inputs.rev }}
+        if: ${{ inputs.bevy-dep }}
         env:
-          REV: ${{ inputs.rev }}
+          BEVY_DEP: ${{ inputs.bevy-dep }}
         run: |
-          # Update the Bevy dependency in `Cargo.toml` to specify the given revision.
-          sed -i "s|bevy = { git = \"https://github.com/bevyengine/bevy.git\" }|bevy = { git = \"https://github.com/bevyengine/bevy.git\", rev = \"$REV\" }|" Cargo.toml
-
-          # Print contents of `Cargo.toml`, for debugging purposes.
-          cat Cargo.toml
+          # Update the Bevy dependency in `Cargo.toml` to specified value.
+          sed -i "s|bevy = { git = \"https://github.com/bevyengine/bevy.git\" }|bevy = $BEVY_DEP|" Cargo.toml
 
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v2
@@ -51,6 +61,8 @@ jobs:
       - name: Run benchmarks
         run: cargo bench -- 2>&1 | tee results.txt
 
+      # TODO: Extract into action.
+      # TODO: Handle when it is not a Git repository.
       - name: Find Bevy commit hash
         id: bevy-hash
         run: |
@@ -98,15 +110,12 @@ jobs:
         uses: ./.github/actions/install-linux-deps
 
       - name: Configure Bevy revision
-        if: ${{ inputs.rev }}
+        if: ${{ inputs.bevy-dep }}
         env:
-          REV: ${{ inputs.rev }}
+          BEVY_DEP: ${{ inputs.bevy-dep }}
         run: |
-          # Update the Bevy dependency in `Cargo.toml` to specify the given revision.
-          sed -i "s|bevy = { git = \"https://github.com/bevyengine/bevy.git\" }|bevy = { git = \"https://github.com/bevyengine/bevy.git\", rev = \"$REV\" }|" Cargo.toml
-
-          # Print contents of `Cargo.toml`, for debugging purposes.
-          cat Cargo.toml
+          # Update the Bevy dependency in `Cargo.toml` to specified value.
+          sed -i "s|bevy = { git = \"https://github.com/bevyengine/bevy.git\" }|bevy = $BEVY_DEP|" Cargo.toml
 
       - name: Cache build files
         uses: Leafwing-Studios/cargo-cache@v2
