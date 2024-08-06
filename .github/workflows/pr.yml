@@ -1,0 +1,72 @@
+name: Benchmark pull request
+run-name: 'Benchmark PR #${{ inputs.pr-number }}'
+
+on:
+  # Must be manually triggered.
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: The number of the pull request.
+        required: true
+        type: number
+
+jobs:
+  run-bench-suite:
+    name: Run benchmark suite for PR ${{ inputs.pr-number }}
+    uses: ./.github/workflows/bench-suite.yml
+    with:
+      bevy-dep: '{ git = "https://github.com/bevyengine/bevy.git", rev = "refs/pull/${{ inputs.pr-number }}/head" }'
+
+  upload-to-bencher-dry:
+    name: Upload results to Bencher in a dry run
+    runs-on: ubuntu-22.04
+    needs: run-bench-suite
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Bencher
+        uses: bencherdev/bencher@main
+
+      - name: Download benchmark results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results
+
+      - name: Download file size binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: file-size
+          path: file-size
+
+      - name: Find Bevy hash
+        id: bevy-hash
+        uses: ./.github/actions/extract-hash
+        with:
+          metadata: ${{ needs.run-bench-suite.outputs.bevy-metadata }}
+
+      - name: Upload benchmarks to Bencher
+        env:
+          BENCHER_PROJECT: bevy
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+          BENCHER_TESTBED: github-actions
+        run: |
+          bencher run \
+            --dry-run \
+            --adapter rust_criterion \
+            --hash ${{ steps.bevy-hash.outputs.hash }} \
+            --file results.txt
+
+      - name: Upload file sizes to Bencher
+        env:
+          BENCHER_PROJECT: bevy
+          BENCHER_API_TOKEN: ${{ secrets.BENCHER_API_TOKEN }}
+          BENCHER_TESTBED: github-actions
+        run: |
+          bencher run \
+            --dry-run \
+            --adapter json \
+            --hash ${{ steps.bevy-hash.outputs.hash }} \
+            --file-size file-size/default \
+            --file-size file-size/minimal \
+            --file-size file-size/empty
