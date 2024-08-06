@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-22.04
     needs: run-bench-suite
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Install Bencher
         uses: bencherdev/bencher@main
 
