@@ -1,4 +1,4 @@
-name: Benchmark Suite
+name: Benchmark suite
 
 on:
   workflow_call:
