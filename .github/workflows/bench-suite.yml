@@ -67,7 +67,7 @@ jobs:
           # Find the version and source properties of Bevy.
           METADATA=$(cargo metadata --format-version 1 | jq '.packages[] | select(.name == "bevy") | { version, source }')
 
-          echo Bevy metadata is $SOURCE.
+          echo Bevy metadata is $METADATA.
 
           echo metadata=$METADATA >> $GITHUB_OUTPUT
 
